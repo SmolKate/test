@@ -2,14 +2,14 @@
 const actionToBind = {
 	"left": { // название активности
 		keys: [37,65], // список кодов кнопок соответствующих активности
-        enabled: false // отключенная активность
+        enabled: true // отключенная активность
 	},
 	"right": {
 		keys: [39,68]
 	},
 	"up": { 
 		keys: [38,87], 
-        enabled: false 
+        enabled: true 
 	},
 	"down": {
 		keys: [40, 83]
@@ -19,5 +19,5 @@ const actionToBind = {
 	// },
 	}
 
-const controller = new InputController(actionToBind)
-controller.attach('div')
+const controller = new InputController(actionToBind, 'div')
+// controller.attach('div')
