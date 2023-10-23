@@ -4,8 +4,9 @@ export class InputController {
     constructor (actionsToBind = {}, target = null) {
         this.enable = true
         this.focused = true
-        this.ACTION_ACTIVATED =  ACTION_ACTIVATED
-        this.ACTION_DEACTIVATED = ACTION_DEACTIVATED
+        this.ACTION_ACTIVATED =  'input-controller:action-activated'
+        this.ACTION_DEACTIVATED = 'input-controller:action-deactivated'
+
 
         this._actionToBind = actionsToBind
         this._target = target
@@ -31,6 +32,11 @@ export class InputController {
             this.enable = false
         }
         this._target = target
+        document.addEventListener('keydown', function(event) {
+            if (event.code == 'KeyZ' && (event.ctrlKey || event.metaKey)) {
+              alert('Отменить!')
+            }
+          });
     }
 
     // отцеливает контроллер от активного DOM элемента и деактивирует контроллер
@@ -50,8 +56,8 @@ export class InputController {
     // провенряет нажата ли переданная кнопка в контроллере
     isKeyPressed (keyCode) {
         Object.keys(this._actionToBind).map(item => {
-            let isInclude = this._actionToBind[item].keys.includes(keyCode)
-            if (isInclude) {
+            let isPressed = this._actionToBind[item].keys.includes(keyCode)
+            if (isPressed) {
                 return this._actionToBind[item].enable
             }
 

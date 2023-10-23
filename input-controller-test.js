@@ -13,7 +13,7 @@ const actionToBind = {
 	"down": {
 		keys: [40, 83]
 	},
-    "spacebar": {
-		keys: [32]
-	},
+    // "spacebar": {
+	// 	keys: [32]
+	// },
 	}
