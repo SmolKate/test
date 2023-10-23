@@ -1,3 +1,4 @@
+
 const actionToBind = {
 	"left": { // название активности
 		keys: [37,65], // список кодов кнопок соответствующих активности
@@ -17,3 +18,6 @@ const actionToBind = {
 	// 	keys: [32]
 	// },
 	}
+
+const controller = new InputController(actionToBind)
+controller.attach('div')
