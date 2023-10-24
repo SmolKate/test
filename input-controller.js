@@ -1,30 +1,20 @@
-
-  
-  class InputController {
+class InputController {
     constructor (actionsToBind = {}, target = null) {
         this.enable = true
         this.focused = true
-        this.ACTION_ACTIVATED =  'input-controller:action-activated'
-        this.ACTION_DEACTIVATED = 'input-controller:action-deactivated'
+        this.ACTION_ACTIVATED =  "input-controller:action-activated"
+        this.ACTION_DEACTIVATED = "input-controller:action-deactivated"
 
         this._actionsToBind = actionsToBind
         this._target = target
         
-        this._elem = null
-        this._command = null
-
-        // this._addKeyListeners(this._actionsToBind, this._target)
         this._addListenerKeyDownHandler = this._addListenerKeyDown.bind(this)
         this._addListenerKeyUpHandler = this._addListenerKeyUp.bind(this)
 
         this.attach(this._target)
-        // this._addKeyListeners = this._addKeyListeners.bind(this)
-        // this._removeKeyListeners = this._removeKeyListeners.bind(this)
-        // this.attach = this.attach.bind(this)
-        
-        // this.enableAction =  this.enableAction.bind(this)
     }
 
+    // генерирует событие в подключенный DOM-элемент и передает название активности
     _createEvent (event, eventName) {
         let command = ''
         Object.keys(this._actionsToBind).forEach(item => {
@@ -33,55 +23,36 @@
             }
         })
         if(this.focused && this.enable && command && this._actionsToBind[command].enabled) {
-            let newEvent = new CustomEvent(eventName, {detail: {action: command}})
-            const elem = document.querySelector(this._target)
+            let newEvent = new CustomEvent(eventName, {detail: {action: command}})                  // нужно ли всплытие события???
+            const elem = document.getElementById(this._target)
             elem.dispatchEvent(newEvent)
             console.log(command)
             console.log(eventName)
         }
     }
 
+    // функция, выполняемая при нажатии кнопки
     _addListenerKeyDown (event) { 
         this._createEvent (event, this.ACTION_ACTIVATED)
     }
 
+    // функция, выполняемая при отжатии кнопки
     _addListenerKeyUp (event) { 
         this._createEvent (event, this.ACTION_DEACTIVATED)
     }
 
-    // _addKeyListeners (commandObj, target) {
-    //     console.log(commandObj)
-    //     console.log(target)
-
-    //     if(commandObj && target) {
-    //         const elem = document.querySelector(target)
-    //         this._target = target
-
-    //         Object.keys(commandObj).map(command => {
-    //             this._command = command
-    //             if(commandObj[command].enabled) {
-    //                 document.addEventListener('keydown',  function  keyPressHandler (e) {
-    //                     this._addListenerKeyDown(command)
-    //                 })
-
-    //                 // document.addEventListener('keydown',  (e) => this._addListenerKeyDown(command, elem, e))
-    //                 document.addEventListener('keyup',  (e) => this._addListenerKeyUp(command, elem, e))
-    //             } 
-    //         })
-    //     }
-    // }
-
-    _removeKeyListeners() {
-        // const elem = document.querySelector(this.target)
-        document.removeEventListener('keydown',  this._addListenerKeyDownHandler)
-        document.removeEventListener('keyup',  this._addListenerKeyUpHandler)
+    // удаляет слушатели событий, навешанные данным контроллером
+    _removeKeyListeners() {                                                               // когда удалять слушатели???
+        document.removeEventListener("keydown",  this._addListenerKeyDownHandler)
+        document.removeEventListener("keyup",  this._addListenerKeyUpHandler)
     }
 
-
+    // добавляет в контроллер переданные активности
     bindAction (actionsToBind) {
        Object.assign(this._actionsToBind, actionsToBind)
-    //    this._addKeyListeners(actionsToBind)
+       console.log("Доступные команды: ", Object.keys(this._actionsToBind))
     }
+
     // вклучает объявленную активность
     enableAction (actionName) { 
         const actionElem = this._actionsToBind[actionName]
@@ -89,8 +60,7 @@
         if (!actionElem) return
         actionElem.enabled = true
 
-        // const obj = Object.fromEntries([[actionName, actionElem]])
-        // this._addKeyListeners(obj, this._target)
+        console.log("Активированные команды: ", Object.keys(this._actionsToBind).filter(command => this._actionsToBind[command].enabled === true))
     }
 
     // выклучает объявленную активность
@@ -98,50 +68,40 @@
         if (!this._actionsToBind[actionName]) return
         const actionElem = this._actionsToBind[actionName]
         actionElem.enabled = false
-
-        // this._removeKeyListeners()
-
+        console.log("Активированные команды: ", Object.keys(this._actionsToBind).filter(command => this._actionsToBind[command].enabled === true))
     }
+
     // нацеливает контроллер на переданный DOM элемент
     attach (target, dontEnable = null) {
         if (dontEnable) {
             this.enable = false
-        } else {                    // нужно ли это условие после else???
+        } else {                                                        // нужно ли это условие после else???
             this.enable = true
         }
         this._target = target
 
-        // const elem = document.querySelector(target)
-        document.addEventListener('keydown',   this._addListenerKeyDownHandler)
-        document.addEventListener('keyup',  this._addListenerKeyUpHandler)
+        document.addEventListener("keydown",   this._addListenerKeyDownHandler)    // при зажатых кнопках непрерывно срабатывает слушатель. Оставить???
+        document.addEventListener("keyup",  this._addListenerKeyUpHandler)
 
-
-
-        // this._addKeyListeners(this._actionsToBind)
-        // const elem = document.querySelector(this._target)
-
-        // Object.keys(this._actionsToBind).map(command => {
-        //     document.addEventListener('keydown',  (e) => this._addListenerKeyDown(command, elem, e))
-        //     document.addEventListener('keyup',  (e) => this._addListenerKeyUp(command, elem, e))
-
-        // })
-
+        console.log(target +" is attached")
     }
 
     // отцеливает контроллер от активного DOM элемента и деактивирует контроллер
     detach () {
         this._target = null
         this.enable = false
+        console.log("Target is detached")
     }
 
     // проверяет, активирована ли переданная активность в контроллере
-    isActionActive (action) {
-        if ( this._actionsToBind[action]?.enabled ) {
+    isActionActive (action) {                                   
+        if ( this._actionsToBind[action]?.enabled ) {                   // нужно ли проверять доступность самого контроллера????
             return !!this._actionsToBind[action].isActive
         }
         return false
     }
-    // провенряет нажата ли переданная кнопка в контроллере
+
+    // проверяет, нажата ли переданная кнопка в контроллере
     isKeyPressed (keyCode) {
         let isPressed = false
         Object.keys(this._actionsToBind).forEach(item => {
@@ -149,6 +109,7 @@
                 isPressed = !!this._actionsToBind[item].isActive
             }
         })
-       return isPressed
+        // console.log("Is " + keyCode +" key pressed:", isPressed)
+        return isPressed
     }
 }

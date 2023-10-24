@@ -15,33 +15,89 @@ const actionToBind = {
         isActive: true
 	},
 	"down": {
-		keys: [40, 83]
+		keys: [40, 83],
+        enabled: true, // отключенная активность
+
 	},
     // "spacebar": {
 	// 	keys: [32]
 	// },
-	}
-
-const controller = new InputController(actionToBind, 'div')
-// controller.attach('div')
-
-const elem = document.querySelector('div')
-elem.addEventListener('input-controller:action-activated', function(event) {
-    console.log('команда активна:', event.detail.action)
-})
-
-elem.addEventListener('input-controller:action-deactivated', function(event) {
-    console.log('команда не активна:', event.detail.action)
-})
-
-div.onfocus = function() {
-    controller.focused = true
-    console.log('focus', controller)
 }
 
-div.onblur = function() {
-    controller.focused = false
-    console.log('blur', controller)
+const actionsToBind = {
+    "jump": {
+        keys: [32]
+    },
+    "down": {
+        keys: [40, 83]
+    },
+}
+
+const actionName = "jump"
+const target = "game2"
+const action = "up"
+const keyCode = 40
+
+const controller = new InputController(actionToBind, "game1")
+// controller.attach('input')
+
+const elem1 = document.getElementById("game1")
+elem1.addEventListener("input-controller:action-activated", function(event) {
+    elem1.classList.add(event.detail.action)
+    console.log("команда для элемента game1 активна: ", event.detail.action)
+})
+
+elem1.addEventListener("input-controller:action-deactivated", function(event) {
+    elem1.classList.remove(event.detail.action)
+    console.log("команда для элемента game1 не активна: ", event.detail.action)
+})
+
+const elem2 = document.getElementById("game2")
+elem2.addEventListener("input-controller:action-activated", function(event) {
+    elem2.classList.add(event.detail.action)
+    console.log("команда для элемента input активна: ", event.detail.action)
+})
+
+elem2.addEventListener("input-controller:action-deactivated", function(event) {
+    elem2.classList.remove(event.detail.action)
+    console.log("команда для элемента input не активна: ", event.detail.action)
+})
+
+// game.onfocus = function() {
+//     controller.focused = true
+//     console.log('focus', controller)
+// }
+
+// game.onblur = function() {
+//     controller.focused = false
+//     console.log('blur', controller)
+
+// }
+
+// Функции, выполняемые при нажатии кнопок
+
+bindActionBtn.onclick = function() {controller.bindAction(actionsToBind)}
+enableActionBtn.onclick = function() {controller.enableAction(actionName)}
+disableActionBtn.onclick = function() {controller.disableAction(actionName)}
+attachBtn.onclick = function() {controller.attach(target)}
+detachBtn.onclick = function() {controller.detach()}
+isActionActiveBtn.onclick = function() {
+    const commandArray = Object.keys(controller._actionsToBind)
+    const isActive = controller.isActionActive(action)
+    console.log("Is " + action +" command active:", isActive)
+}
+isKeyPressedBtn.onclick = function() {
+    const isPressed = controller.isKeyPressed(keyCode)
+    console.log("Is " + keyCode +" key pressed:", isPressed)
 
 }
+enableControllerBtn.onclick = function() {
+    controller.enable = true
+    console.log("Controller is enable: ", controller.enable)
+}
+disableControllerBtn.onclick = function() {
+    controller.enable = false
+    console.log("Controller is enable: ", controller.enable)
+}
+
 

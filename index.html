@@ -1,42 +1,40 @@
 <!DOCTYPE html>
 <html>
     <style>
-        div {
-            position: absolute;
-            top: 50px;
-            left: 50px;
+        #game1 {
             width: 100px;
             height: 100px;
             border: 1px solid black;
+            margin: 50px;
+        }
+
+        #game2 {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            margin: 50px;
         }
 
         .right {
-            left: 100px;
+            transform: translate(50px, 0px)
         }
 
         .left {
-            left: 25px;
+            transform: translate(-50px, 0px)
         }
         
         .up {
-           top: 25px;
+            transform: translate(0px, -50px)
         }
         
         .down {
-            top: 60px;
+            transform: translate(0px, 50px)
         }
 
-        .input-controller:action-deactivated {
+        .jump {
             background-color: blue;
         }
-        
-        :action-deactivated {
-            border: 1px solid red;
-        }
-
-        :action-activated {
-            border: 1px solid green;
-        }
+       
 
         
 
@@ -45,37 +43,25 @@
         <meta charset="utf-8">
     </head>
     <body>
-        <div id="div" tabindex="1">Hello</div>
-        <input type="text" id="input">
+        
+        <button id="bindActionBtn">Bind Action</button>
+        <button id="enableActionBtn">Enable Action</button>
+        <button id="disableActionBtn">Disable Action</button>
+        <button id="attachBtn">Attach</button>
+        <button id="detachBtn">Detach</button>
+        <button id="isActionActiveBtn">Is Action Active</button>
+        <button id="isKeyPressedBtn">Is Key Pressed</button>
+        <button id="enableControllerBtn">Enable Controller</button>
+        <button id="disableControllerBtn">Disable Controller</button>
+        <div>
+            <div id="game1" tabindex="1">Game 1</div>
+        </div>
+        <div>
+            <div id="game2" tabindex="2">Game 2</div>
+        </div>
+
         <script src="./input-controller.js"></script>
         <script src="./input-controller-test.js"></script>
-
-        <!-- <script>
-
-            
-            // const controller = new InputController(actionToBind)
-            // controller.attach('div')
-        //     const target = 'div'
-        // let div = document.querySelector('div')
-        // document.addEventListener('keydown', function(event) {
-
-        // if (event.keyCode == 37) {
-        //     console.log('click')
-        //     div.classList = ['left']
-        // }
-        // if (event.keyCode == 39) {
-        //     console.log('click right')
-        //     div.classList = ['right']
-        // }
-        // if (event.keyCode == 38) {
-        //     console.log('click up')
-        //     div.classList = ['up']
-        // }
-        // if (event.keyCode == 40) {
-        //     console.log('click down')
-        //     div.classList = ['down']
-        // }
-        // });
-        // </script> -->
+        
     </body>
 </html>
