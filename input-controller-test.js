@@ -1,8 +1,8 @@
-
+// константы для проверки работы кнопок
 const actionToBind = {
 	"left": { // название активности
 		keys: [37,65], // список кодов кнопок соответствующих активности
-        enabled: true, // отключенная активность
+        enabled: false, // отключенная активность
         isActive: false
 	},
 	"right": {
@@ -16,12 +16,9 @@ const actionToBind = {
 	},
 	"down": {
 		keys: [40, 83],
-        enabled: true, // отключенная активность
+        enabled: true, 
 
 	},
-    // "spacebar": {
-	// 	keys: [32]
-	// },
 }
 
 const actionsToBind = {
@@ -34,13 +31,13 @@ const actionsToBind = {
 }
 
 const actionName = "jump"
-const target = "game2"
 const action = "up"
 const keyCode = 40
 
+// создание экземпляра контроллера
 const controller = new InputController(actionToBind, "game1")
-// controller.attach('input')
 
+// слушатели событий на элементы Game 1 и Game 2
 const elem1 = document.getElementById("game1")
 elem1.addEventListener("input-controller:action-activated", function(event) {
     elem1.classList.add(event.detail.action)
@@ -55,14 +52,15 @@ elem1.addEventListener("input-controller:action-deactivated", function(event) {
 const elem2 = document.getElementById("game2")
 elem2.addEventListener("input-controller:action-activated", function(event) {
     elem2.classList.add(event.detail.action)
-    console.log("команда для элемента input активна: ", event.detail.action)
+    console.log("команда для элемента game2 активна: ", event.detail.action)
 })
 
 elem2.addEventListener("input-controller:action-deactivated", function(event) {
     elem2.classList.remove(event.detail.action)
-    console.log("команда для элемента input не активна: ", event.detail.action)
+    console.log("команда для элемента game2 не активна: ", event.detail.action)
 })
 
+// переключение фокуса между элементами
 elem1.onfocus = function() {
     controller.attach("game1")
     controller.focused = true
@@ -73,7 +71,6 @@ elem1.onblur = function() {
     controller.detach()
     controller.focused = false
     console.log('blur on game1')
-
 }
 
 elem2.onfocus = function() {
@@ -86,7 +83,6 @@ elem2.onblur = function() {
     controller.detach()
     controller.focused = false
     console.log('blur on game2')
-
 }
 
 // Функции, выполняемые при нажатии кнопок
@@ -94,10 +90,10 @@ elem2.onblur = function() {
 bindActionBtn.onclick = function() {controller.bindAction(actionsToBind)}
 enableActionBtn.onclick = function() {controller.enableAction(actionName)}
 disableActionBtn.onclick = function() {controller.disableAction(actionName)}
-attachBtn.onclick = function() {controller.attach(target)}
+attachBtn1.onclick = function() {controller.attach("game1")}
+attachBtn2.onclick = function() {controller.attach("game2")}
 detachBtn.onclick = function() {controller.detach()}
 isActionActiveBtn.onclick = function() {
-    const commandArray = Object.keys(controller._actionsToBind)
     const isActive = controller.isActionActive(action)
     console.log("Is " + action +" command active:", isActive)
 }
@@ -114,5 +110,3 @@ disableControllerBtn.onclick = function() {
     controller.enable = false
     console.log("Controller is enable: ", controller.enable)
 }
-
-
