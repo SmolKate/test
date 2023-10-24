@@ -1,14 +1,7 @@
 <!DOCTYPE html>
 <html>
     <style>
-        #game1 {
-            width: 100px;
-            height: 100px;
-            border: 1px solid black;
-            margin: 50px;
-        }
-
-        #game2 {
+        #game1, #game2, #game3  {
             width: 100px;
             height: 100px;
             border: 1px solid black;
@@ -53,12 +46,10 @@
         <button id="isKeyPressedBtn">Is Key Pressed</button>
         <button id="enableControllerBtn">Enable Controller</button>
         <button id="disableControllerBtn">Disable Controller</button>
-        <div>
-            <div id="game1" tabindex="1">Game 1</div>
-        </div>
-        <div>
-            <div id="game2" tabindex="2">Game 2</div>
-        </div>
+        <div id="game1" tabindex="1">Game 1</div>
+        <div id="game2" tabindex="2">Game 2</div>
+        <div id="game3" tabindex="3">Game 3</div>
+        
 
         <script src="./input-controller.js"></script>
         <script src="./input-controller-test.js"></script>

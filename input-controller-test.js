@@ -63,16 +63,31 @@ elem2.addEventListener("input-controller:action-deactivated", function(event) {
     console.log("команда для элемента input не активна: ", event.detail.action)
 })
 
-// game.onfocus = function() {
-//     controller.focused = true
-//     console.log('focus', controller)
-// }
+elem1.onfocus = function() {
+    controller.attach("game1")
+    controller.focused = true
+    console.log('focus on game1')
+}
 
-// game.onblur = function() {
-//     controller.focused = false
-//     console.log('blur', controller)
+elem1.onblur = function() {
+    controller.detach()
+    controller.focused = false
+    console.log('blur on game1')
 
-// }
+}
+
+elem2.onfocus = function() {
+    controller.attach("game2")
+    controller.focused = true
+    console.log('focus on game2')
+}
+
+elem2.onblur = function() {
+    controller.detach()
+    controller.focused = false
+    console.log('blur on game2')
+
+}
 
 // Функции, выполняемые при нажатии кнопок
 

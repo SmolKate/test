@@ -26,8 +26,6 @@ class InputController {
             let newEvent = new CustomEvent(eventName, {detail: {action: command}})                  // нужно ли всплытие события???
             const elem = document.getElementById(this._target)
             elem.dispatchEvent(newEvent)
-            console.log(command)
-            console.log(eventName)
         }
     }
 
