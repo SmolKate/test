@@ -24,3 +24,24 @@ const actionToBind = {
 
 const controller = new InputController(actionToBind, 'div')
 // controller.attach('div')
+
+const elem = document.querySelector('div')
+elem.addEventListener('input-controller:action-activated', function(event) {
+    console.log('команда активна:', event.detail.action)
+})
+
+elem.addEventListener('input-controller:action-deactivated', function(event) {
+    console.log('команда не активна:', event.detail.action)
+})
+
+div.onfocus = function() {
+    controller.focused = true
+    console.log('focus', controller)
+}
+
+div.onblur = function() {
+    controller.focused = false
+    console.log('blur', controller)
+
+}
+

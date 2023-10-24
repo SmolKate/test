@@ -25,22 +25,28 @@
         // this.enableAction =  this.enableAction.bind(this)
     }
 
+    _createEvent (event, eventName) {
+        let command = ''
+        Object.keys(this._actionsToBind).forEach(item => {
+            if (this._actionsToBind[item].keys.includes(event.keyCode)) {
+                command = item
+            }
+        })
+        if(this.focused && this.enable && command && this._actionsToBind[command].enabled) {
+            let newEvent = new CustomEvent(eventName, {detail: {action: command}})
+            const elem = document.querySelector(this._target)
+            elem.dispatchEvent(newEvent)
+            console.log(command)
+            console.log(eventName)
+        }
+    }
+
     _addListenerKeyDown (event) { 
-   
-        console.log(event.keyCode)
-        // if (this._actionsToBind[command].keys.includes(e.keyCode)) {
-        //         elem.classList = [command]
-        //         elem.classList.add('input-controller:action-activated')
-        //     }
+        this._createEvent (event, this.ACTION_ACTIVATED)
     }
 
     _addListenerKeyUp (event) { 
-        console.log(event.keyCode)
-   
-        // if (this._actionsToBind[command].keys.includes(e.keyCode)) {
-        //         elem.classList = [command]
-        //         elem.classList.add('input-controller:action-deactivated')
-        //     }
+        this._createEvent (event, this.ACTION_DEACTIVATED)
     }
 
     // _addKeyListeners (commandObj, target) {
@@ -93,7 +99,7 @@
         const actionElem = this._actionsToBind[actionName]
         actionElem.enabled = false
 
-        this._removeKeyListeners()
+        // this._removeKeyListeners()
 
     }
     // нацеливает контроллер на переданный DOM элемент
