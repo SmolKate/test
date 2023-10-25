@@ -1,29 +1,31 @@
 class InputController {
-    ACTION_ACTIVATED =  "input-controller:action-activated"
-    ACTION_DEACTIVATED = "input-controller:action-deactivated"
+
+    static ACTION_ACTIVATED =  "input-controller:action-activated"
+
+    static ACTION_DEACTIVATED = "input-controller:action-deactivated"
 
     constructor (actionsToBind = {}, target = null) {
+        this._addListenerKeyDownHandler = this._addListenerKeyDown.bind(this)
+        this._addListenerKeyUpHandler = this._addListenerKeyUp.bind(this)
+
         this.enable = true
         this.focused = true
 
         this._actionsToBind = actionsToBind
         this._target = target
-        
-        this._addListenerKeyDownHandler = this._addListenerKeyDown.bind(this)
-        this._addListenerKeyUpHandler = this._addListenerKeyUp.bind(this)
 
         this.attach(this._target)
     }
 
     // генерирует событие в подключенный DOM-элемент и передает название активности
-    _createEvent (event, eventName) {
+    _createEvent (event, eventName) {   // ! проверка на дубль команды для одного и того же кода
         let command = ''
         Object.keys(this._actionsToBind).forEach(item => {
             if (this._actionsToBind[item].keys.includes(event.keyCode)) {
                 command = item
-                if (eventName == this.ACTION_ACTIVATED) {
+                if (eventName == InputController.ACTION_ACTIVATED) {
                     this._actionsToBind[item].isActive = true
-                } else if (eventName == this.ACTION_DEACTIVATED) {
+                } else if (eventName == InputController.ACTION_DEACTIVATED) {
                     this._actionsToBind[item].isActive = false
                 }
             }
@@ -37,12 +39,12 @@ class InputController {
 
     // функция, выполняемая при нажатии кнопки
     _addListenerKeyDown (event) { 
-        this._createEvent (event, this.ACTION_ACTIVATED)
+        this._createEvent (event, InputController.ACTION_ACTIVATED)
     }
 
     // функция, выполняемая при отжатии кнопки
     _addListenerKeyUp (event) { 
-        this._createEvent (event, this.ACTION_DEACTIVATED)
+        this._createEvent (event, InputController.ACTION_DEACTIVATED)
     }
 
     // удаляет слушатели событий, навешанные данным контроллером
@@ -101,15 +103,12 @@ class InputController {
     }
 
     // проверяет, активирована ли переданная активность в контроллере
-    isActionActive (action) {                                   
-        if (this.enable && this._actionsToBind[action]?.enabled) {
-            return !!this._actionsToBind[action].isActive
-        }
-        return false
+    isActionActive (action) {           
+        return this.enable && this._actionsToBind[action]?.enabled && !!this._actionsToBind[action].isActive
     }
 
     // проверяет, нажата ли переданная кнопка в контроллере
-    isKeyPressed (keyCode) {
+    isKeyPressed (keyCode) {                                            // !любая кнопка
         let isPressed = false
         Object.keys(this._actionsToBind).forEach(item => {
             if (this._actionsToBind[item].keys.includes(keyCode)) {
@@ -117,5 +116,19 @@ class InputController {
             }
         })
         return isPressed
+    }
+}
+
+class Action{
+
+    set isActive(isActive){
+        if(this._isActive === isActive) return
+            this._isActive = isActive;
+
+            dispatchEvent(isActive?"ddd":"222")
+    }
+
+    get isActive(){
+        return this._isActive;
     }
 }
