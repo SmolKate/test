@@ -1,9 +1,10 @@
 class InputController {
+    ACTION_ACTIVATED =  "input-controller:action-activated"
+    ACTION_DEACTIVATED = "input-controller:action-deactivated"
+
     constructor (actionsToBind = {}, target = null) {
         this.enable = true
         this.focused = true
-        this.ACTION_ACTIVATED =  "input-controller:action-activated"
-        this.ACTION_DEACTIVATED = "input-controller:action-deactivated"
 
         this._actionsToBind = actionsToBind
         this._target = target
