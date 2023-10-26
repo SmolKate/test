@@ -34,6 +34,7 @@ const keyCode = 32
 
 // создание экземпляра контроллера
 const controller = new InputController(actionToBind, "game1")
+controller.registerPlugin(KeyboardPlugin)
 
 // слушатели событий на элементы Game 1 и Game 2
 const elem1 = document.getElementById("game1")
