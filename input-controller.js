@@ -13,37 +13,40 @@ class InputController {
 
         this._actionsToBind = actionsToBind
         this._target = target
+        this._pressedKeyCode = []
 
         this.attach(this._target)
     }
 
     // генерирует событие в подключенный DOM-элемент и передает название активности
-    _createEvent (event, eventName) {   // ! проверка на дубль команды для одного и того же кода
-        let command = ''
+    _createEvent (event, eventName) { 
         Object.keys(this._actionsToBind).forEach(item => {
-            if (this._actionsToBind[item].keys.includes(event.keyCode)) {
-                command = item
-                if (eventName == InputController.ACTION_ACTIVATED) {
-                    this._actionsToBind[item].isActive = true
-                } else if (eventName == InputController.ACTION_DEACTIVATED) {
-                    this._actionsToBind[item].isActive = false
+            if (this.focused && this.enable && this._actionsToBind[item].keys.includes(event.keyCode) && this._actionsToBind[item].enabled) {
+                let newIsActive
+                if (eventName === InputController.ACTION_ACTIVATED) {
+                    newIsActive = true
+                } else if (eventName === InputController.ACTION_DEACTIVATED) {
+                    newIsActive = false
                 }
+                const prevIsActive = this._actionsToBind[item].isActive
+                const action = new Action(eventName, item, this._target, prevIsActive)
+                action.isActive = newIsActive
+                this._actionsToBind[item].isActive = action.isActive
             }
         })
-        if(this.focused && this.enable && command && this._actionsToBind[command].enabled) {
-            let newEvent = new CustomEvent(eventName, {detail: {action: command}})
-            const elem = document.getElementById(this._target)
-            elem.dispatchEvent(newEvent)
-        }
     }
 
     // функция, выполняемая при нажатии кнопки
     _addListenerKeyDown (event) { 
+        if (!this._pressedKeyCode.includes(event.keyCode)) {
+            this._pressedKeyCode.push(event.keyCode)
+        }
         this._createEvent (event, InputController.ACTION_ACTIVATED)
     }
 
     // функция, выполняемая при отжатии кнопки
     _addListenerKeyUp (event) { 
+        this._pressedKeyCode = this._pressedKeyCode.filter(code => code !== event.keyCode)
         this._createEvent (event, InputController.ACTION_DEACTIVATED)
     }
 
@@ -108,24 +111,27 @@ class InputController {
     }
 
     // проверяет, нажата ли переданная кнопка в контроллере
-    isKeyPressed (keyCode) {                                            // !любая кнопка
-        let isPressed = false
-        Object.keys(this._actionsToBind).forEach(item => {
-            if (this._actionsToBind[item].keys.includes(keyCode)) {
-                isPressed = !!this._actionsToBind[item].isActive
-            }
-        })
-        return isPressed
+    isKeyPressed (keyCode) {                                                
+        return this._pressedKeyCode.includes(keyCode)
     }
 }
 
-class Action{
+class Action {
+
+    constructor (eventName, command, target, isActive) {
+        this._eventName = eventName
+        this._command = command
+        this._target = target
+        this._isActive = isActive
+    }
 
     set isActive(isActive){
-        if(this._isActive === isActive) return
-            this._isActive = isActive;
+        if(!this._isActive !== isActive) return  // в условии используется !this._isActive, так как this._isActive может быть undefined
+        this._isActive = isActive
 
-            dispatchEvent(isActive?"ddd":"222")
+        let newEvent = new CustomEvent(this._eventName, {detail: {action: this._command}})
+        const elem = document.getElementById(this._target)
+        elem.dispatchEvent(newEvent)
     }
 
     get isActive(){

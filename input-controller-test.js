@@ -3,7 +3,6 @@ const actionToBind = {
 	"left": { // название активности
 		keys: [37,65], // список кодов кнопок соответствующих активности
         enabled: false, // отключенная активность
-        isActive: false
 	},
 	"right": {
 		keys: [39,68],
@@ -12,7 +11,6 @@ const actionToBind = {
 	"up": { 
 		keys: [38,87], 
         enabled: true,
-        isActive: true
 	},
 	"down": {
 		keys: [40, 83],
@@ -23,7 +21,7 @@ const actionToBind = {
 
 const actionsToBind = {
     "jump": {
-        keys: [32]
+        keys: [32, 38]
     },
     "down": {
         keys: [40, 83]
@@ -32,7 +30,7 @@ const actionsToBind = {
 
 const actionName = "jump"
 const action = "up"
-const keyCode = 40
+const keyCode = 32
 
 // создание экземпляра контроллера
 const controller = new InputController(actionToBind, "game1")
