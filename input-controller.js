@@ -11,7 +11,9 @@ class InputController {
         this.enable = true
         this.focused = true
 
-        this._actionsToBind = actionsToBind
+        this._actionsToBind = Object.fromEntries(
+            Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
+        )
         this._target = target
         this._pressedKeyCode = []
 
@@ -22,16 +24,18 @@ class InputController {
     _createEvent (event, eventName) { 
         Object.keys(this._actionsToBind).forEach(item => {
             if (this.focused && this.enable && this._actionsToBind[item].keys.includes(event.keyCode) && this._actionsToBind[item].enabled) {
-                let newIsActive
+                this._actionsToBind[item].target = this._target
                 if (eventName === InputController.ACTION_ACTIVATED) {
-                    newIsActive = true
+                    this._actionsToBind[item].isActive = true
                 } else if (eventName === InputController.ACTION_DEACTIVATED) {
-                    newIsActive = false
+                    for (let key of this._actionsToBind[item].keys) {       // проверка, нажата ли какая-либо другая кнопка, отвечающая за эту же команду. Если нажата, то событие сброса команды не генерится
+                        if(this._pressedKeyCode.includes(key)) {
+                            console.log('include', key)
+                            return
+                        }
+                    }
+                    this._actionsToBind[item].isActive = false
                 }
-                const prevIsActive = this._actionsToBind[item].isActive
-                const action = new Action(eventName, item, this._target, prevIsActive)
-                action.isActive = newIsActive
-                this._actionsToBind[item].isActive = action.isActive
             }
         })
     }
@@ -58,7 +62,9 @@ class InputController {
 
     // добавляет в контроллер переданные активности
     bindAction (actionsToBind) {
-       Object.assign(this._actionsToBind, actionsToBind)
+        Object.assign(this._actionsToBind, Object.fromEntries(
+            Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
+        ))
        console.log("Доступные команды: ", Object.keys(this._actionsToBind))
     }
 
@@ -118,23 +124,33 @@ class InputController {
 
 class Action {
 
-    constructor (eventName, command, target, isActive) {
-        this._eventName = eventName
-        this._command = command
-        this._target = target
+    constructor(command, {keys, enabled = false, isActive = false}) {
+        this.keys = keys
+        this.enabled = enabled
         this._isActive = isActive
+        this._command = command
     }
 
     set isActive(isActive){
-        if(!this._isActive !== isActive) return  // в условии используется !this._isActive, так как this._isActive может быть undefined
+        if(this._isActive === isActive) return 
         this._isActive = isActive
 
-        let newEvent = new CustomEvent(this._eventName, {detail: {action: this._command}})
-        const elem = document.getElementById(this._target)
-        elem.dispatchEvent(newEvent)
+        let downEvent = new CustomEvent(InputController.ACTION_ACTIVATED, {detail: {action: this._command}})
+        let upEvent = new CustomEvent(InputController.ACTION_DEACTIVATED, {detail: {action: this._command}})
+
+        const elem = document.getElementById(this.target)
+        elem.dispatchEvent(isActive ? downEvent : upEvent )
     }
 
     get isActive(){
-        return this._isActive;
+        return this._isActive
+    }
+
+    set target(target) {
+        this._target = target
+    }
+
+    get target(){
+        return this._target
     }
 }
