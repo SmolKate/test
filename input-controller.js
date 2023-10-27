@@ -23,20 +23,31 @@ class InputController {
         const newObj =  Object.fromEntries(
             Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
         )
+
+        // Object.entries(actionsToBind).forEach(([key, settings])=>{
+        //     if(this._actionsToBind[key]){
+        //         this._actionsToBind[key].updateSettings(settings);
+        //     }else{
+        //         this._actionsToBind[key]= new Action(key, actionSettings);
+        //     }
+        // })
+
+
         const initKeys = Object.keys(this._actionsToBind)
 
         for ( let elem in newObj) {
             if(initKeys.includes(elem)) {
                 Object.assign(this._actionsToBind[elem], newObj[elem])
+                // console.log(this._actionsToBind[elem]);
             } else {
                 this._actionsToBind[elem] = newObj[elem]
             }
         }
 
+        console.log(this._actionsToBind)
         for (let plugin of this._plugin) {
             plugin._actionsToBind = this._actionsToBind
         }  
-        console.log(this)
     }
 
     // вклучает объявленную активность
@@ -79,14 +90,14 @@ class InputController {
             this.enable = true
             this._plugin.forEach(plugin => plugin.enable = true)
         }
-                                                             
+
         this._target = target
         this.focused = true
 
         this._plugin.forEach(plugin => {
             plugin._target = target
             plugin.focused = true
-            plugin.pluginAttach()
+            plugin.pluginAttach(target)
         })
     }
 
@@ -112,8 +123,9 @@ class InputController {
     }
 
     // подключает плагин, расширяющий функционал обработки до нового типа ввода
-    registerPlugin (plugin) {
-        const newplugin = new plugin(this._actionsToBind, this._target)
+    registerPlugin (Plugin) {
+        console.log(this._actionsToBind)
+        const newplugin = new Plugin(this._actionsToBind, this._target, this.enable, this.focused)
         this._plugin.push(newplugin)
         return newplugin
     }
@@ -129,8 +141,6 @@ class Action {
         
         for (const [key, value] of Object.entries(settings)) {
             this[key] = value
-            console.log(this)
-
         }
     }
 
@@ -157,17 +167,22 @@ class Action {
         return this._target
     }
 }
-class KeyboardPlugin extends InputController {
-    constructor(...arg) {
-        super(...arg)
+class KeyboardPlugin {
+    constructor(actionsToBind, target, enable, focused) {
         this._addListenerKeyDownHandler = this._addListenerKeyDown.bind(this)
         this._addListenerKeyUpHandler = this._addListenerKeyUp.bind(this)
         this._pressedKeyCode = []
+        this._actionsToBind = actionsToBind
+        this._target = target
+        this.enable = enable
+        this.focused = focused
+        
+        console.log(this._actionsToBind)
     }
 
     _createEvent (event, eventName) { 
         Object.keys(this._actionsToBind).forEach(item => {
-            if (this.focused && this.enable && this._actionsToBind[item].keys.includes(event.keyCode) && this._actionsToBind[item].enabled) {
+            if (this.focused && this.enable && this._actionsToBind[item].keys && this._actionsToBind[item].keys.includes(event.keyCode) && this._actionsToBind[item].enabled) {
                 this._actionsToBind[item].target = this._target
                 if (eventName === InputController.ACTION_ACTIVATED) {
                     this._actionsToBind[item].isActive = true
