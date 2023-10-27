@@ -13,21 +13,35 @@ class InputController {
             Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
         )
         this._target = target
-        this.plagin = [KeyboardPlugin]
+        this._plagin = []
 
         this.attach(this._target)
     }
 
     // добавляет в контроллер переданные активности
     bindAction (actionsToBind) {
-        Object.assign(this._actionsToBind, Object.fromEntries(
+        const newObj =  Object.fromEntries(
             Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
-        ))
-       console.log("Доступные команды: ", Object.keys(this._actionsToBind))
+        )
+        const initKeys = Object.keys(this._actionsToBind)
+
+        for ( let elem in newObj) {
+            if(initKeys.includes(elem)) {
+                Object.assign(this._actionsToBind[elem], newObj[elem])
+            } else {
+                this._actionsToBind[elem] = newObj[elem]
+            }
+        }
     }
 
     // вклучает объявленную активность
     enableAction (actionName) { 
+        // меняет состояние во всех плагинах
+        for (let plagin of this._plagin) {
+            if (plagin._actionsToBind[actionName]) {
+             plagin._actionsToBind[actionName].enabled = true
+            }
+        }  
         const actionElem = this._actionsToBind[actionName]
 
         if (!actionElem) return
@@ -38,9 +52,16 @@ class InputController {
 
     // выклучает объявленную активность
     disableAction (actionName) {
+        // меняет состояние во всех плагинах
+        for (let plagin of this._plagin) {
+           if (plagin._actionsToBind[actionName]) {
+            plagin._actionsToBind[actionName].enabled = false
+           }
+        }  
         if (!this._actionsToBind[actionName]) return
         const actionElem = this._actionsToBind[actionName]
         actionElem.enabled = false
+       
         console.log("Активированные команды: ", Object.keys(this._actionsToBind).filter(command => this._actionsToBind[command].enabled === true))
     }
 
@@ -48,51 +69,75 @@ class InputController {
     attach (target, dontEnable = null) {
         if (dontEnable) {
             this.enable = false
+            this._plagin.forEach(plagin => plagin.enable = false)
         } else {
             this.enable = true
+            this._plagin.forEach(plagin => plagin.enable = true)
         }
                                                              
         this._target = target
         this.focused = true
+
+        this._plagin.forEach(plagin => {
+            plagin._target = target
+            plagin.focused = true
+            plagin.pluginAttach()
+        })
     }
 
     // отцеливает контроллер от активного DOM элемента и деактивирует контроллер
     detach () {
         this._target = null
         this.enable = false
+        this._plagin.forEach(plagin => {
+            plagin._target = null
+            plagin.enable = false
+            plagin.pluginDetach()
+        })
     }
 
     // проверяет, активирована ли переданная активность в контроллере
-    isActionActive (action) {           
-        return this.enable && this._actionsToBind[action]?.enabled && !!this._actionsToBind[action].isActive
+    isActionActive (action) {   
+        for (let plagin of this._plagin) {
+            if (plagin.enable && Object.keys(plagin._actionsToBind).includes(action) && plagin._actionsToBind[action].enabled && !!plagin._actionsToBind[action].isActive) {
+                return true
+            }
+        }  
+        return false    
     }
 
     // подключает плагин, расширяющий функционал обработки до нового типа ввода
     registerPlugin (plugin) {
-        if (!this.plagin.includes(plugin)) return
-        console.log(this._target)
-        return new plugin(this._actionsToBind, this._target)
+        const newPlagin = new plugin(this._actionsToBind, this._target)
+        this._plagin.push(newPlagin)
+        return newPlagin
     }
+
 }
 
 class Action {
 
-    constructor(command, {keys, enabled = false, isActive = false}) {
-        this.keys = keys
+    constructor(command, {enabled = false, isActive = false, ...settings}) {
         this.enabled = enabled
         this._isActive = isActive
         this._command = command
+        
+        for (const [key, value] of Object.entries(settings)) {
+            this[key] = value
+            console.log(this)
+
+        }
     }
 
     set isActive(isActive){
         if(this._isActive === isActive) return 
         this._isActive = isActive
 
-        let downEvent = new CustomEvent(InputController.ACTION_ACTIVATED, {detail: {action: this._command}})
-        let upEvent = new CustomEvent(InputController.ACTION_DEACTIVATED, {detail: {action: this._command}})
+        let activateEvent = new CustomEvent(InputController.ACTION_ACTIVATED, {detail: {action: this._command}})
+        let deactivateEvent = new CustomEvent(InputController.ACTION_DEACTIVATED, {detail: {action: this._command}})
 
         const elem = document.getElementById(this.target)
-        elem.dispatchEvent(isActive ? downEvent : upEvent )
+        elem.dispatchEvent(isActive ? activateEvent : deactivateEvent )
     }
 
     get isActive(){
@@ -160,18 +205,37 @@ class KeyboardPlugin extends InputController {
         return this._pressedKeyCode.includes(keyCode)
     }
 
-    detach () {
-        super.detach()
+    pluginDetach () {
         this._removeKeyListeners()
         console.log("Target is detached")
     }
 
-    attach (target, dontEnable = null) {
-        super.attach(target, dontEnable)
+    pluginAttach (target) {
 
         document.addEventListener("keydown",   this._addListenerKeyDownHandler) 
         document.addEventListener("keyup",  this._addListenerKeyUpHandler)
 
         console.log(target +" is new attached")
     }
+
+    detach () {
+        this._target = null
+        this.enable = false
+        this.pluginDetach()
+        
+    }
+
+    attach (target, dontEnable = null) {
+        if (dontEnable) {
+            this.enable = false
+        } else {
+            this.enable = true
+        }
+                                                             
+        this._target = target
+        this.focused = true
+
+        this.pluginAttach (target)
+    }
+
 }

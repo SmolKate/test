@@ -1,22 +1,70 @@
 // константы для проверки работы кнопок
-const actionToBind = {
+const actionToBindArrows = {
 	"left": { // название активности
-		keys: [37,65], // список кодов кнопок соответствующих активности
+		keys: [37], // список кодов кнопок соответствующих активности
         enabled: false, // отключенная активность
 	},
 	"right": {
-		keys: [39,68],
+		keys: [39],
         enabled: true,
 	},
 	"up": { 
-		keys: [38,87], 
+		keys: [38], 
         enabled: true,
 	},
 	"down": {
-		keys: [40, 83],
+		keys: [40],
         enabled: true, 
 
 	},
+}
+
+const actionToBindLetters = {
+	"left": { // название активности
+		keys: [65], // список кодов кнопок соответствующих активности
+        enabled: false, // отключенная активность
+	},
+	"right": {
+		keys: [68],
+        enabled: true,
+	},
+	"up": { 
+		keys: [87], 
+        enabled: true,
+	},
+	"down": {
+		keys: [83],
+        enabled: true, 
+
+	},
+} 
+
+const actionToBind2 = {
+	"left": { // название активности
+		mouse: ['left'], // список кодов кнопок соответствующих активности
+        mouseisTrue: true,
+        enabled: true, // отключенная активность
+	},
+	"right": {
+		mouse: ['right'],
+        enabled: false,
+        mouseisTrue: true,
+
+	},
+	"up": { 
+		mouse: ['up'], 
+        enabled: true,
+        mouseisTrue: false,
+
+	},
+	"down": {
+		mouse: ['down'],
+        enabled: false, 
+        mouseisTrue: false,
+	},
+    "jump": {
+        mouse: ['jump']
+    },
 }
 
 const actionsToBind = {
@@ -33,9 +81,16 @@ const action = "up"
 const keyCode = 32
 
 // создание экземпляра контроллера
-const baseController = new InputController(actionToBind)
+const baseController = new InputController()
 const controller = baseController.registerPlugin(KeyboardPlugin)
+const controller2 = baseController.registerPlugin(KeyboardPlugin)
+
 controller.attach("game1")
+controller2.attach("game2")
+
+controller.bindAction(actionToBindArrows)
+controller2.bindAction(actionToBindLetters)
+
 
 // слушатели событий на элементы Game 1 и Game 2
 const elem1 = document.getElementById("game1")
@@ -87,14 +142,17 @@ elem2.onblur = function() {
 
 // Функции, выполняемые при нажатии кнопок
 
-bindActionBtn.onclick = function() {controller.bindAction(actionsToBind)}
-enableActionBtn.onclick = function() {controller.enableAction(actionName)}
-disableActionBtn.onclick = function() {controller.disableAction(actionName)}
-attachBtn1.onclick = function() {controller.attach("game1")}
-attachBtn2.onclick = function() {controller.attach("game2")}
-detachBtn.onclick = function() {controller.detach()}
+bindActionBtn.onclick = function() {
+    controller.bindAction(actionsToBind)
+    controller2.bindAction(actionsToBind)
+}
+enableActionBtn.onclick = function() {baseController.enableAction(actionName)}
+disableActionBtn.onclick = function() {baseController.disableAction(actionName)}
+attachBtn1.onclick = function() {baseController.attach("game1")}
+attachBtn2.onclick = function() {baseController.attach("game2")}
+detachBtn.onclick = function() {baseController.detach()}
 isActionActiveBtn.onclick = function() {
-    const isActive = controller.isActionActive(action)
+    const isActive = baseController.isActionActive(action)
     console.log("Is " + action +" command active:", isActive)
 }
 isKeyPressedBtn.onclick = function() {
@@ -103,10 +161,14 @@ isKeyPressedBtn.onclick = function() {
 
 }
 enableControllerBtn.onclick = function() {
+    baseController.enable = true
     controller.enable = true
+    controller2.enable = true
     console.log("Controller is enable: ", controller.enable)
 }
 disableControllerBtn.onclick = function() {
+    baseController.enable = false
     controller.enable = false
+    controller2.enable = false
     console.log("Controller is enable: ", controller.enable)
 }
