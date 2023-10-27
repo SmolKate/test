@@ -33,8 +33,9 @@ const action = "up"
 const keyCode = 32
 
 // создание экземпляра контроллера
-const controller = new InputController(actionToBind, "game1")
-controller.registerPlugin(KeyboardPlugin)
+const baseController = new InputController(actionToBindwwwwwwwwwwwwwww)
+const controller = baseController.registerPlugin(KeyboardPlugin)
+controller.attach("game1")
 
 // слушатели событий на элементы Game 1 и Game 2
 const elem1 = document.getElementById("game1")
