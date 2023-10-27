@@ -33,7 +33,7 @@ const action = "up"
 const keyCode = 32
 
 // создание экземпляра контроллера
-const baseController = new InputController(actionToBindwwwwwwwwwwwwwww)
+const baseController = new InputController(actionToBind)
 const controller = baseController.registerPlugin(KeyboardPlugin)
 controller.attach("game1")
 
