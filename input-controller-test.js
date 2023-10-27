@@ -118,7 +118,9 @@ elem2.addEventListener("input-controller:action-deactivated", function(event) {
 // переключение фокуса между элементами
 elem1.onfocus = function() {
     controller.attach("game1")
+    controller2.detach()
     controller.focused = true
+    controller2.focused = false
     console.log('focus on game1')
 }
 
@@ -129,14 +131,16 @@ elem1.onblur = function() {
 }
 
 elem2.onfocus = function() {
-    controller.attach("game2")
-    controller.focused = true
+    controller.detach()
+    controller2.attach("game2")
+    controller.focused = false
+    controller2.focused = true
     console.log('focus on game2')
 }
 
 elem2.onblur = function() {
-    controller.detach()
-    controller.focused = false
+    controller2.detach()
+    controller2.focused = false
     console.log('blur on game2')
 }
 
