@@ -13,7 +13,7 @@ class InputController {
             Object.entries(actionsToBind).map(([key, actionSettings]) => [key, new Action(key, actionSettings)])
         )
         this._target = target
-        this._plagin = []
+        this._plugin = []
 
         this.attach(this._target)
     }
@@ -37,9 +37,9 @@ class InputController {
     // вклучает объявленную активность
     enableAction (actionName) { 
         // меняет состояние во всех плагинах
-        for (let plagin of this._plagin) {
-            if (plagin._actionsToBind[actionName]) {
-             plagin._actionsToBind[actionName].enabled = true
+        for (let plugin of this._plugin) {
+            if (plugin._actionsToBind[actionName]) {
+             plugin._actionsToBind[actionName].enabled = true
             }
         }  
         const actionElem = this._actionsToBind[actionName]
@@ -53,9 +53,9 @@ class InputController {
     // выклучает объявленную активность
     disableAction (actionName) {
         // меняет состояние во всех плагинах
-        for (let plagin of this._plagin) {
-           if (plagin._actionsToBind[actionName]) {
-            plagin._actionsToBind[actionName].enabled = false
+        for (let plugin of this._plugin) {
+           if (plugin._actionsToBind[actionName]) {
+            plugin._actionsToBind[actionName].enabled = false
            }
         }  
         if (!this._actionsToBind[actionName]) return
@@ -69,19 +69,19 @@ class InputController {
     attach (target, dontEnable = null) {
         if (dontEnable) {
             this.enable = false
-            this._plagin.forEach(plagin => plagin.enable = false)
+            this._plugin.forEach(plugin => plugin.enable = false)
         } else {
             this.enable = true
-            this._plagin.forEach(plagin => plagin.enable = true)
+            this._plugin.forEach(plugin => plugin.enable = true)
         }
                                                              
         this._target = target
         this.focused = true
 
-        this._plagin.forEach(plagin => {
-            plagin._target = target
-            plagin.focused = true
-            plagin.pluginAttach()
+        this._plugin.forEach(plugin => {
+            plugin._target = target
+            plugin.focused = true
+            plugin.pluginAttach()
         })
     }
 
@@ -89,17 +89,17 @@ class InputController {
     detach () {
         this._target = null
         this.enable = false
-        this._plagin.forEach(plagin => {
-            plagin._target = null
-            plagin.enable = false
-            plagin.pluginDetach()
+        this._plugin.forEach(plugin => {
+            plugin._target = null
+            plugin.enable = false
+            plugin.pluginDetach()
         })
     }
 
     // проверяет, активирована ли переданная активность в контроллере
     isActionActive (action) {   
-        for (let plagin of this._plagin) {
-            if (plagin.enable && Object.keys(plagin._actionsToBind).includes(action) && plagin._actionsToBind[action].enabled && !!plagin._actionsToBind[action].isActive) {
+        for (let plugin of this._plugin) {
+            if (plugin.enable && Object.keys(plugin._actionsToBind).includes(action) && plugin._actionsToBind[action].enabled && !!plugin._actionsToBind[action].isActive) {
                 return true
             }
         }  
@@ -108,9 +108,9 @@ class InputController {
 
     // подключает плагин, расширяющий функционал обработки до нового типа ввода
     registerPlugin (plugin) {
-        const newPlagin = new plugin(this._actionsToBind, this._target)
-        this._plagin.push(newPlagin)
-        return newPlagin
+        const newplugin = new plugin(this._actionsToBind, this._target)
+        this._plugin.push(newplugin)
+        return newplugin
     }
 
 }
