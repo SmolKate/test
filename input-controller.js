@@ -32,6 +32,11 @@ class InputController {
                 this._actionsToBind[elem] = newObj[elem]
             }
         }
+
+        for (let plugin of this._plugin) {
+            plugin._actionsToBind = this._actionsToBind
+        }  
+        console.log(this)
     }
 
     // вклучает объявленную активность

@@ -88,8 +88,8 @@ const controller2 = baseController.registerPlugin(KeyboardPlugin)
 controller.attach("game1")
 controller2.attach("game2")
 
-controller.bindAction(actionToBindArrows)
-controller2.bindAction(actionToBindLetters)
+baseController.bindAction(actionToBindArrows)
+baseController.bindAction(actionToBind2)
 
 
 // слушатели событий на элементы Game 1 и Game 2
